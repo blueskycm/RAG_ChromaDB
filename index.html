@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>多策略 RAG 文件問答系統｜RAB ChromaDB Gradio</title>
+
+  <meta
+    name="description"
+    content="多策略 RAG 文件問答系統，支援 PDF / DOCX 文件分析，整合 ChromaDB、Groq API、Gradio 與 Hugging Face Spaces。"
+  />
+
+  <meta property="og:title" content="多策略 RAG 文件問答系統" />
+  <meta
+    property="og:description"
+    content="整合 ChromaDB、Groq API、Gradio 與 Hugging Face Spaces 的文件問答展示頁。"
+  />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root {
+      --bg-main: #080b12;
+      --bg-card: rgba(17, 24, 39, 0.82);
+      --bg-card-strong: rgba(15, 23, 42, 0.96);
+      --primary: #34d399;
+      --primary-dark: #10b981;
+      --primary-soft: rgba(52, 211, 153, 0.14);
+      --accent: #60a5fa;
+      --amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-soft: #94a3b8;
+      --border: rgba(148, 163, 184, 0.24);
+      --border-strong: rgba(52, 211, 153, 0.35);
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max-width: 1360px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(16, 185, 129, 0.22), transparent 30%),
+        radial-gradient(circle at 88% 16%, rgba(96, 165, 250, 0.18), transparent 32%),
+        radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.10), transparent 28%),
+        linear-gradient(135deg, #080b12 0%, #0f172a 52%, #111827 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.78), transparent 76%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: relative;
+      width: min(var(--max-width), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 36px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 42px;
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.74);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      background:
+        linear-gradient(135deg, rgba(52, 211, 153, 1), rgba(96, 165, 250, 0.95));
+      color: #020617;
+      font-weight: 1000;
+      box-shadow: 0 10px 28px rgba(52, 211, 153, 0.24);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nav-link {
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: 0.2s ease;
+    }
+
+    .nav-link:hover {
+      background: var(--primary-soft);
+      color: #a7f3d0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      gap: 34px;
+      align-items: stretch;
+      margin-bottom: 30px;
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18px 4px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      gap: 9px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: rgba(6, 78, 59, 0.28);
+      color: #a7f3d0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      backdrop-filter: blur(12px);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 16px rgba(52, 211, 153, 0.95);
+    }
+
+    h1 {
+      margin: 22px 0 16px;
+      color: var(--text-main);
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: 1.03;
+      letter-spacing: -0.065em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #f8fafc 0%, #a7f3d0 46%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 900;
+      transition: 0.22s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #34d399, #10b981);
+      color: #022c22;
+      box-shadow: 0 18px 36px rgba(16, 185, 129, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 44px rgba(16, 185, 129, 0.36);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: var(--border-strong);
+    }
+
+    .hero-panel {
+      position: relative;
+      padding: 22px;
+      border-radius: var(--radius-xl);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      right: -96px;
+      top: -96px;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.18);
+      filter: blur(2px);
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      left: -92px;
+      bottom: -92px;
+      border-radius: 50%;
+      background: rgba(96, 165, 250, 0.13);
+      filter: blur(2px);
+    }
+
+    .stats-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .stat {
+      min-height: 128px;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(2, 6, 23, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .stat-number {
+      color: #a7f3d0;
+      font-size: 31px;
+      font-weight: 1000;
+      letter-spacing: -0.05em;
+    }
+
+    .stat-label {
+      margin-top: 9px;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .tech-stack {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.11);
+      color: #a7f3d0;
+      border: 1px solid rgba(52, 211, 153, 0.22);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 28px 0 16px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      color: var(--text-main);
+      font-size: clamp(26px, 3vw, 38px);
+      letter-spacing: -0.05em;
+    }
+
+    .section-title p {
+      margin: 6px 0 0;
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .mini-note {
+      color: var(--text-soft);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .gradio-shell {
+      padding: 16px;
+      border-radius: var(--radius-xl);
+      background: rgba(15, 23, 42, 0.84);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+    }
+
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 4px 8px 16px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot.red {
+      background: #ef4444;
+    }
+
+    .dot.yellow {
+      background: #f59e0b;
+    }
+
+    .dot.green {
+      background: #22c55e;
+    }
+
+    .url-bar {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.58);
+      color: var(--text-soft);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .space-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #a7f3d0;
+      font-size: 13px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .space-status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.75);
+    }
+
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      height: 84vh;
+      min-height: 780px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #0f172a;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #0f172a;
+    }
+
+    .iframe-fallback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(2, 6, 23, 0.42);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .iframe-fallback a {
+      color: #a7f3d0;
+      font-weight: 900;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .footer {
+      margin-top: 26px;
+      padding: 20px 0 8px;
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panel {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 20px, var(--max-width));
+        padding: 16px 0 28px;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        border-radius: 24px;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .mini-note {
+        white-space: normal;
+      }
+
+      .gradio-shell {
+        padding: 10px;
+        border-radius: 22px;
+      }
+
+      .browser-bar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .url-bar {
+        width: 100%;
+      }
+
+      .iframe-container {
+        height: 86vh;
+        min-height: 720px;
+        border-radius: 16px;
+      }
+
+      h1 {
+        font-size: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="主要導覽">
+      <a class="brand" href="#">
+        <span class="brand-mark">R</span>
+        <span>RAB ChromaDB Gradio</span>
+      </a>
+
+      <div class="nav-links">
+        <a class="nav-link" href="#app">啟動系統</a>
+        <a
+          class="nav-link"
+          href="https://github.com/blueskycm/RAG_ChromaDB"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+        <a
+          class="nav-link"
+          href="https://huggingface.co/spaces/blueskycm/RAB_ChromaDB_gradio"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          HF Space
+        </a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">AI Document Intelligence</div>
+
+        <h1>
+          多策略
+          <span class="gradient-text">RAG 文件問答系統</span>
+        </h1>
+
+        <p class="lead">
+          這是一個整合 ChromaDB、SentenceTransformers、Groq API 與 Gradio 的文件問答系統。
+          使用者可以上傳 PDF / DOCX 文件，透過語意搜尋、TF-IDF、混合檢索、多查詢擴展等策略，
+          快速從文件中找到可回答問題的依據。
+        </p>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="#app">
+            立即使用系統
+          </a>
+
+          <a
+            class="btn btn-secondary"
+            href="https://blueskycm-rab-chromadb-gradio.hf.space"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            另開 Gradio App
+          </a>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="系統特色">
+        <div class="stats-grid">
+          <div class="stat">
+            <div class="stat-number">8</div>
+            <div class="stat-label">種 RAG 檢索策略，包含 Semantic、TF-IDF、Hybrid、HyDE 等。</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-number">2</div>
+            <div class="stat-label">支援 PDF 與 DOCX 文件格式，適合文件分析與知識查詢。</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-number">RAG</div>
+            <div class="stat-label">以檢索增強生成降低幻覺，回答更貼近文件內容。</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-number">API</div>
+            <div class="stat-label">透過 Groq API 呼叫 LLM，避免在前端暴露金鑰。</div>
+          </div>
+        </div>
+
+        <div class="tech-stack">
+          <span class="chip">Gradio</span>
+          <span class="chip">ChromaDB</span>
+          <span class="chip">Groq</span>
+          <span class="chip">PDF / DOCX</span>
+          <span class="chip">SentenceTransformers</span>
+        </div>
+      </aside>
+    </section>
+
+    <section id="app">
+      <div class="section-title">
+        <div>
+          <h2>線上展示</h2>
+          <p>下方完整保留 Hugging Face Space / Gradio 操作介面；GitHub Pages 只作為展示外殼。</p>
+        </div>
+
+        <div class="mini-note">
+          若 Space 休眠，首次載入可能需要等待數秒。
+        </div>
+      </div>
+
+      <div class="gradio-shell">
+        <div class="browser-bar">
+          <div class="dots" aria-hidden="true">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+
+          <div class="url-bar">
+            https://blueskycm-rab-chromadb-gradio.hf.space
+          </div>
+
+          <div class="space-status">
+            HF Space
+          </div>
+        </div>
+
+        <div class="iframe-container">
+          <iframe
+            src="https://blueskycm-rab-chromadb-gradio.hf.space"
+            title="多策略 RAG 文件問答系統"
+            loading="lazy"
+            allow="clipboard-read; clipboard-write; microphone; camera"
+          ></iframe>
+        </div>
+
+        <div class="iframe-fallback">
+          如果 iframe 沒有正常顯示，可以
+          <a
+            href="https://blueskycm-rab-chromadb-gradio.hf.space"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            直接開啟 Gradio App
+          </a>
+          。
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Powered by GitHub Pages · Hugging Face Spaces · Gradio · ChromaDB
+    </footer>
+  </main>
+</body>
+</html>
