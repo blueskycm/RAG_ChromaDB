@@ -3,28 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>多策略 RAG 文件問答系統｜RAB ChromaDB Gradio</title>
-
-  <meta
-    name="description"
-    content="多策略 RAG 文件問答系統，支援 PDF / DOCX 文件分析，整合 ChromaDB、Groq API、Gradio 與 Hugging Face Spaces。"
-  />
-
+  <title>多策略 RAG 文件問答系統｜GitHub Pages 展示版</title>
+  <meta name="description" content="多策略 RAG 文件問答系統作品展示頁，介紹 ChromaDB、SentenceTransformers、Groq API、PDF / DOCX 文件問答與 RAG 架構。" />
   <meta property="og:title" content="多策略 RAG 文件問答系統" />
-  <meta
-    property="og:description"
-    content="整合 ChromaDB、Groq API、Gradio 與 Hugging Face Spaces 的文件問答展示頁。"
-  />
+  <meta property="og:description" content="GitHub Pages 靜態展示頁：介紹 ChromaDB、SentenceTransformers、Groq API 與多策略 RAG 文件問答系統。" />
   <meta property="og:type" content="website" />
 
   <style>
     :root {
       --bg-main: #080b12;
       --bg-card: rgba(17, 24, 39, 0.82);
-      --bg-card-strong: rgba(15, 23, 42, 0.96);
       --primary: #34d399;
-      --primary-dark: #10b981;
       --primary-soft: rgba(52, 211, 153, 0.14);
       --accent: #60a5fa;
       --amber: #f59e0b;
@@ -37,28 +26,16 @@
       --radius-xl: 30px;
       --radius-lg: 22px;
       --radius-md: 16px;
-      --max-width: 1360px;
+      --max-width: 1180px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family:
-        "Noto Sans TC",
-        "Microsoft JhengHei",
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text-main);
       background:
         radial-gradient(circle at 12% 8%, rgba(16, 185, 129, 0.22), transparent 30%),
@@ -80,16 +57,13 @@
       mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.78), transparent 76%);
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
 
     .page {
       position: relative;
       width: min(var(--max-width), calc(100% - 32px));
       margin: 0 auto;
-      padding: 24px 0 36px;
+      padding: 24px 0 40px;
     }
 
     .nav {
@@ -121,8 +95,7 @@
       width: 36px;
       height: 36px;
       border-radius: 13px;
-      background:
-        linear-gradient(135deg, rgba(52, 211, 153, 1), rgba(96, 165, 250, 0.95));
+      background: linear-gradient(135deg, rgba(52, 211, 153, 1), rgba(96, 165, 250, 0.95));
       color: #020617;
       font-weight: 1000;
       box-shadow: 0 10px 28px rgba(52, 211, 153, 0.24);
@@ -150,10 +123,10 @@
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
       gap: 34px;
       align-items: stretch;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
     .hero-copy {
@@ -212,6 +185,17 @@
       line-height: 1.9;
     }
 
+    .notice {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(245, 158, 11, 0.10);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      color: #fde68a;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -254,14 +238,17 @@
       border-color: var(--border-strong);
     }
 
-    .hero-panel {
-      position: relative;
-      padding: 22px;
+    .hero-panel, .card, .demo-card {
       border-radius: var(--radius-xl);
       background: var(--bg-card);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(20px);
+    }
+
+    .hero-panel {
+      position: relative;
+      padding: 22px;
       overflow: hidden;
     }
 
@@ -274,18 +261,6 @@
       top: -96px;
       border-radius: 50%;
       background: rgba(52, 211, 153, 0.18);
-      filter: blur(2px);
-    }
-
-    .hero-panel::after {
-      content: "";
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      left: -92px;
-      bottom: -92px;
-      border-radius: 50%;
-      background: rgba(96, 165, 250, 0.13);
       filter: blur(2px);
     }
 
@@ -338,12 +313,14 @@
       font-weight: 900;
     }
 
+    .section { margin-top: 34px; }
+
     .section-title {
       display: flex;
       align-items: end;
       justify-content: space-between;
       gap: 20px;
-      margin: 28px 0 16px;
+      margin: 0 0 16px;
     }
 
     .section-title h2 {
@@ -360,19 +337,75 @@
       line-height: 1.7;
     }
 
-    .mini-note {
-      color: var(--text-soft);
-      font-size: 13px;
-      white-space: nowrap;
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
 
-    .gradio-shell {
+    .card {
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.26);
+    }
+
+    .card-icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-bottom: 14px;
+      border-radius: 15px;
+      background: rgba(52, 211, 153, 0.13);
+      border: 1px solid rgba(52, 211, 153, 0.24);
+      color: #a7f3d0;
+      font-weight: 1000;
+      font-size: 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .flow-step {
+      position: relative;
+      padding: 18px 16px;
+      border-radius: var(--radius-lg);
+      background: rgba(2, 6, 23, 0.46);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #a7f3d0;
+      font-size: 14px;
+    }
+
+    .flow-step span {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .demo-card {
       padding: 16px;
-      border-radius: var(--radius-xl);
-      background: rgba(15, 23, 42, 0.84);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
+      overflow: hidden;
     }
 
     .browser-bar {
@@ -394,17 +427,9 @@
       border-radius: 50%;
     }
 
-    .dot.red {
-      background: #ef4444;
-    }
-
-    .dot.yellow {
-      background: #f59e0b;
-    }
-
-    .dot.green {
-      background: #22c55e;
-    }
+    .dot.red { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .dot.green { background: #22c55e; }
 
     .url-bar {
       flex: 1;
@@ -419,79 +444,100 @@
       border: 1px solid rgba(148, 163, 184, 0.2);
     }
 
-    .space-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #a7f3d0;
-      font-size: 13px;
-      font-weight: 900;
-      flex-shrink: 0;
+    .mock-app {
+      display: grid;
+      grid-template-columns: 0.9fr 1.4fr;
+      gap: 16px;
+      min-height: 460px;
     }
 
-    .space-status::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.75);
-    }
-
-    .iframe-container {
-      position: relative;
-      width: 100%;
-      height: 84vh;
-      min-height: 780px;
+    .mock-side, .mock-main {
       border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: #0f172a;
+      background: rgba(2, 6, 23, 0.48);
+      border: 1px solid rgba(148, 163, 184, 0.20);
+      padding: 18px;
+    }
+
+    .mock-label {
+      margin-bottom: 10px;
+      color: var(--text-soft);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .mock-upload {
+      display: grid;
+      place-items: center;
+      min-height: 126px;
+      margin-bottom: 16px;
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(52, 211, 153, 0.45);
+      background: rgba(52, 211, 153, 0.07);
+      color: #a7f3d0;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .mock-control {
+      height: 40px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.88);
       border: 1px solid rgba(148, 163, 184, 0.22);
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: #0f172a;
-    }
-
-    .iframe-fallback {
-      margin-top: 12px;
-      padding: 12px 14px;
+    .mock-question {
+      min-height: 110px;
+      margin-bottom: 14px;
+      padding: 14px;
       border-radius: var(--radius-md);
-      background: rgba(2, 6, 23, 0.42);
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.22);
       color: var(--text-soft);
-      font-size: 13px;
       line-height: 1.7;
     }
 
-    .iframe-fallback a {
-      color: #a7f3d0;
-      font-weight: 900;
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 3px;
+    .mock-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #34d399, #10b981);
+      color: #022c22;
+      font-weight: 1000;
     }
 
+    .mock-answer {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .mock-answer b { color: var(--text-main); }
+
     .footer {
-      margin-top: 26px;
-      padding: 20px 0 8px;
+      margin-top: 30px;
+      padding: 22px 0 8px;
       text-align: center;
       color: var(--text-soft);
       font-size: 13px;
     }
 
     @media (max-width: 1024px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-panel {
-        order: -1;
-      }
+      .hero { grid-template-columns: 1fr; }
+      .hero-panel { order: -1; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr 1fr; }
+      .mock-app { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 760px) {
@@ -506,47 +552,23 @@
         border-radius: 24px;
       }
 
-      .nav-links {
-        flex-wrap: wrap;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
+      .nav-links { flex-wrap: wrap; }
+      .stats-grid, .flow { grid-template-columns: 1fr; }
       .section-title {
         align-items: flex-start;
         flex-direction: column;
       }
-
-      .mini-note {
-        white-space: normal;
-      }
-
-      .gradio-shell {
+      .demo-card {
         padding: 10px;
         border-radius: 22px;
       }
-
       .browser-bar {
         align-items: flex-start;
         flex-direction: column;
         gap: 10px;
       }
-
-      .url-bar {
-        width: 100%;
-      }
-
-      .iframe-container {
-        height: 86vh;
-        min-height: 720px;
-        border-radius: 16px;
-      }
-
-      h1 {
-        font-size: 40px;
-      }
+      .url-bar { width: 100%; }
+      h1 { font-size: 40px; }
     }
   </style>
 </head>
@@ -556,33 +578,20 @@
     <nav class="nav" aria-label="主要導覽">
       <a class="brand" href="#">
         <span class="brand-mark">R</span>
-        <span>RAB ChromaDB Gradio</span>
+        <span>RAG ChromaDB</span>
       </a>
 
       <div class="nav-links">
-        <a class="nav-link" href="#app">啟動系統</a>
-        <a
-          class="nav-link"
-          href="https://github.com/blueskycm/RAG_ChromaDB"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHub
-        </a>
-        <a
-          class="nav-link"
-          href="https://huggingface.co/spaces/blueskycm/RAB_ChromaDB_gradio"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          HF Space
-        </a>
+        <a class="nav-link" href="#overview">特色</a>
+        <a class="nav-link" href="#flow">流程</a>
+        <a class="nav-link" href="#preview">展示</a>
+        <a class="nav-link" href="https://github.com/blueskycm/RAG_ChromaDB" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </nav>
 
     <section class="hero">
       <div class="hero-copy">
-        <div class="eyebrow">AI Document Intelligence</div>
+        <div class="eyebrow">GitHub Pages Showcase</div>
 
         <h1>
           多策略
@@ -590,24 +599,19 @@
         </h1>
 
         <p class="lead">
-          這是一個整合 ChromaDB、SentenceTransformers、Groq API 與 Gradio 的文件問答系統。
-          使用者可以上傳 PDF / DOCX 文件，透過語意搜尋、TF-IDF、混合檢索、多查詢擴展等策略，
-          快速從文件中找到可回答問題的依據。
+          這是一個以文件問答為核心的 RAG 專案展示頁，聚焦於資料擷取、切分、向量化、
+          檢索策略與 LLM 回答生成。此版本不再嵌入 Hugging Face iframe，
+          而是改成乾淨、穩定、適合履歷與作品集展示的 GitHub Pages 靜態頁。
         </p>
 
-        <div class="actions">
-          <a class="btn btn-primary" href="#app">
-            立即使用系統
-          </a>
+        <div class="notice">
+          注意：GitHub Pages 是靜態網站，不能直接執行 Python、ChromaDB 或 LLM API。
+          本頁展示系統設計與成果；實際互動問答需部署到後端平台，例如 Render、Cloud Run、Fly.io、Railway 或其他伺服器。
+        </div>
 
-          <a
-            class="btn btn-secondary"
-            href="https://blueskycm-rab-chromadb-gradio.hf.space"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            另開 Gradio App
-          </a>
+        <div class="actions">
+          <a class="btn btn-primary" href="#preview">查看展示介面</a>
+          <a class="btn btn-secondary" href="https://github.com/blueskycm/RAG_ChromaDB" target="_blank" rel="noopener noreferrer">查看 GitHub Repo</a>
         </div>
       </div>
 
@@ -617,87 +621,121 @@
             <div class="stat-number">8</div>
             <div class="stat-label">種 RAG 檢索策略，包含 Semantic、TF-IDF、Hybrid、HyDE 等。</div>
           </div>
-
           <div class="stat">
             <div class="stat-number">2</div>
             <div class="stat-label">支援 PDF 與 DOCX 文件格式，適合文件分析與知識查詢。</div>
           </div>
-
           <div class="stat">
             <div class="stat-number">RAG</div>
             <div class="stat-label">以檢索增強生成降低幻覺，回答更貼近文件內容。</div>
           </div>
-
           <div class="stat">
             <div class="stat-number">API</div>
-            <div class="stat-label">透過 Groq API 呼叫 LLM，避免在前端暴露金鑰。</div>
+            <div class="stat-label">後端呼叫 LLM API，避免在前端暴露金鑰。</div>
           </div>
         </div>
 
         <div class="tech-stack">
-          <span class="chip">Gradio</span>
+          <span class="chip">Python</span>
           <span class="chip">ChromaDB</span>
-          <span class="chip">Groq</span>
+          <span class="chip">Groq API</span>
           <span class="chip">PDF / DOCX</span>
           <span class="chip">SentenceTransformers</span>
         </div>
       </aside>
     </section>
 
-    <section id="app">
+    <section id="overview" class="section">
       <div class="section-title">
         <div>
-          <h2>線上展示</h2>
-          <p>下方完整保留 Hugging Face Space / Gradio 操作介面；GitHub Pages 只作為展示外殼。</p>
-        </div>
-
-        <div class="mini-note">
-          若 Space 休眠，首次載入可能需要等待數秒。
+          <h2>專案特色</h2>
+          <p>從文件處理到多策略檢索，讓 RAG 系統不只是能跑，而是能解釋、能比較、能擴充。</p>
         </div>
       </div>
 
-      <div class="gradio-shell">
+      <div class="grid-3">
+        <article class="card">
+          <div class="card-icon">01</div>
+          <h3>多格式文件解析</h3>
+          <p>支援 PDF 與 DOCX 文件，將段落與表格內容轉為可檢索文本，適合用於規範、報告、企劃與知識文件。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">02</div>
+          <h3>多策略檢索</h3>
+          <p>結合語意搜尋、TF-IDF、混合搜尋、重排序、多查詢擴展、上下文壓縮、父子文檔與 HyDE。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">03</div>
+          <h3>可解釋回答來源</h3>
+          <p>回答時保留檢索片段，可檢查模型依據，避免 AI 回答變成「自信滿滿地瞎掰」。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="flow" class="section">
+      <div class="section-title">
+        <div>
+          <h2>系統流程</h2>
+          <p>整體流程從文件上傳開始，到向量檢索與 LLM 生成回答結束。</p>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step"><strong>Step 1</strong><span>上傳 PDF / DOCX 文件，擷取純文字與表格內容。</span></div>
+        <div class="flow-step"><strong>Step 2</strong><span>將長文本切成 chunk，保留 overlap 降低語意斷裂。</span></div>
+        <div class="flow-step"><strong>Step 3</strong><span>透過 embedding model 將文字轉為向量並寫入 ChromaDB。</span></div>
+        <div class="flow-step"><strong>Step 4</strong><span>依問題選擇 Semantic、TF-IDF、Hybrid 或 HyDE 等策略檢索。</span></div>
+        <div class="flow-step"><strong>Step 5</strong><span>將檢索片段交給 LLM 生成繁體中文回答與重點整理。</span></div>
+      </div>
+    </section>
+
+    <section id="preview" class="section">
+      <div class="section-title">
+        <div>
+          <h2>展示介面</h2>
+          <p>這是靜態展示用的 UI Preview，不依賴 iframe，也不連接外部後端。</p>
+        </div>
+      </div>
+
+      <div class="demo-card">
         <div class="browser-bar">
           <div class="dots" aria-hidden="true">
             <span class="dot red"></span>
             <span class="dot yellow"></span>
             <span class="dot green"></span>
           </div>
-
-          <div class="url-bar">
-            https://blueskycm-rab-chromadb-gradio.hf.space
-          </div>
-
-          <div class="space-status">
-            HF Space
-          </div>
+          <div class="url-bar">github.io / RAG_ChromaDB / static-showcase</div>
         </div>
 
-        <div class="iframe-container">
-          <iframe
-            src="https://blueskycm-rab-chromadb-gradio.hf.space"
-            title="多策略 RAG 文件問答系統"
-            loading="lazy"
-            allow="clipboard-read; clipboard-write; microphone; camera"
-          ></iframe>
-        </div>
+        <div class="mock-app">
+          <div class="mock-side">
+            <div class="mock-label">Step 01 · Upload</div>
+            <div class="mock-upload">PDF / DOCX<br />文件上傳區</div>
+            <div class="mock-label">Step 02 · Strategy</div>
+            <div class="mock-control"></div>
+            <div class="mock-control"></div>
+            <div class="mock-control"></div>
+            <div class="mock-label">Step 03 · Search Params</div>
+            <div class="mock-control"></div>
+          </div>
 
-        <div class="iframe-fallback">
-          如果 iframe 沒有正常顯示，可以
-          <a
-            href="https://blueskycm-rab-chromadb-gradio.hf.space"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            直接開啟 Gradio App
-          </a>
-          。
+          <div class="mock-main">
+            <div class="mock-label">Step 04 · Question</div>
+            <div class="mock-question">這份文件的核心重點是什麼？請根據文件內容整理成條列式回答。</div>
+            <div class="mock-button">提問</div>
+            <div class="mock-answer">
+              <b>AI 回答預覽</b><br />
+              1. 系統會先從文件中找到與問題最相關的片段。<br />
+              2. 接著把片段作為上下文提供給 LLM。<br />
+              3. 最後生成繁體中文回答，並附上可檢查的檢索來源。
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <footer class="footer">
-      Powered by GitHub Pages · Hugging Face Spaces · Gradio · ChromaDB
+      Powered by GitHub Pages · Static Showcase · RAG Architecture
     </footer>
   </main>
 </body>
